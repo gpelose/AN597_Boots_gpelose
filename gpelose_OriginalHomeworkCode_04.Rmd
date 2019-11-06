@@ -5,3 +5,37 @@ date: "11/5/2019"
 output: html_document
 ---
 
+Question:
+
+[1] Using the “KamilarAndCooperData.csv” dataset, run a linear regression looking at log(HomeRange_km2) in relation to log(Body_mass_female_mean) and report your β coeffiecients (slope and intercept).
+***
+First I need to dowload the KamilarAndCooperData.csv data. 
+```{r}
+install.packages("curl")
+```
+
+```{r}
+library("curl")
+```
+
+```{r}
+f <- curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall19/KamilarAndCooperData.csv")
+d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = FALSE)
+head(d)
+```
+
+```{r}
+m <- lm(log(HomeRange_km2) ~ log(Body_mass_female_mean), data = d)
+m
+```
+
+I got -9.441 and 1.036 as my slope and my y-intercept. 
+
+[2] Then, use bootstrapping to sample from your data 1000 times with replacement, each time fitting the same model and calculating the same coefficients. This generates a sampling distribution for each β coefficient.
+use package simple boot ot \\r boot
+
+Estimate the standard error for each of your β coefficients as the standard deviation of the sampling distribution from your bootstrap and determine the 95% CI for each of your β coefficients based on the appropriate quantiles from your sampling distribution.
+
+How does the former compare to the SE estimated from your entire dataset using the formula for standard error implemented in lm()?
+
+How does the latter compare to the 95% CI estimated from your entire dataset?
