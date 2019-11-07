@@ -5,7 +5,7 @@ date: "11/5/2019"
 output: html_document
 ---
 
-Question:
+Question 1:
 
 [1] Using the “KamilarAndCooperData.csv” dataset, run a linear regression looking at log(HomeRange_km2) in relation to log(Body_mass_female_mean) and report your β coeffiecients (slope and intercept).
 ***
