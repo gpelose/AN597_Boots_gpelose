@@ -31,8 +31,20 @@ m
 
 I got -9.441 and 1.036 as my slope and my y-intercept. 
 
+***
 [2] Then, use bootstrapping to sample from your data 1000 times with replacement, each time fitting the same model and calculating the same coefficients. This generates a sampling distribution for each β coefficient.
-use package simple boot ot \\r boot
+***
+
+```{r}
+set <- NULL 
+n <- 15
+for (i in 1:10000){
+    set[i] <- mean(sample(f, n, replace=TRUE))
+}
+quantile(set, c(0.050, 0.950))
+```
+
+
 
 Estimate the standard error for each of your β coefficients as the standard deviation of the sampling distribution from your bootstrap and determine the 95% CI for each of your β coefficients based on the appropriate quantiles from your sampling distribution.
 
