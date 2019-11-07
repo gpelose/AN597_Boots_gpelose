@@ -109,7 +109,7 @@ Estimate the standard error for each of your β coefficients as the standard dev
 boot.ci(results)
 ```
 
-Everything below this was me trying to figure this out, dont, I am keeping it so i can see where I went wrong
+Everything below this was me trying to figure this out, (ignore), I am keeping it so i can see where I went wrong
 ***
 ```{r}
 install.packages("sciplot")
