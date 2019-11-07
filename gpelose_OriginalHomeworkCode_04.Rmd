@@ -23,7 +23,7 @@ f <- curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/m
 d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = FALSE)
 head(d)
 ```
-
+Next I will perform a linear regression on my data.
 ```{r}
 m <- lm(log(HomeRange_km2) ~ log(Body_mass_female_mean), data = d)
 m
@@ -43,7 +43,7 @@ logit.bootstrap <- function(data, indices) {
   return(coef(fit))
 } #This function calculated the linear model for each output. 
 
-set.seed(250) # random # generator
+set.seed(250) # random number generator
 
 results <- boot(data=d, statistic=logit.bootstrap, R=1000) # 1000 samples 
 results
@@ -102,14 +102,20 @@ quantile(set, c(0.050, 0.950))
 se(set)
 ```
 ***
+NEXT PART OF QUESTION 2:
 
 Estimate the standard error for each of your β coefficients as the standard deviation of the sampling distribution from your bootstrap and determine the 95% CI for each of your β coefficients based on the appropriate quantiles from your sampling distribution.
+***
+
+I was able to achieve the standard errors from my bootsrap in my analysis above.
+
+Now I will get the confidence intervals from my bootstrap. 
 
 ```{r}
 boot.ci(results)
 ```
 
-Everything below this was me trying to figure this out, (ignore), I am keeping it so i can see where I went wrong
+Everything below this was me trying to figure this out, (ignore), I am keeping it so i can see where I went wrong.
 ***
 ```{r}
 install.packages("sciplot")
@@ -130,16 +136,20 @@ ci
 ***
 
 How does the former compare to the SE estimated from your entire dataset using the formula for standard error implemented in lm()?
+***
+I am not exaclty sure how to answer this question, I dont know what is meant by the the former, I understand where I get the SE estimated from the entire dataset but not the error implemented in lm().
+***
 
 How does the latter compare to the 95% CI estimated from your entire dataset?
+***
+Same problem as before, I understand where my bootsrapped confidence intervals came from but I do not know where the "latter" is coming from to campare it to.
 
 
-
-5 Problems with my code
-1. I struggled to understand how to describe my data at the end of problem 2 in the homwork set. 
+5 struggles with my code
+1. I struggled to understand how to describe the questions about my data at the end of problem 2 in the homwork set. 
 2. I made many mistakes attempting to try and figure out the second question of the homework problem, but after a while I think that I was able to figure it out.
-3. I struggled to stay focused during this homework set, when I couldnt figure something out I started to lose focus.
-4.I could not figure out the bootstrapping from the modules, I had to go look online to try and figure something out. I feel like I missed where the informationw as on how to bootstrap with linear regressions was on the modules.
+3. I struggled to stay focused during this homework set, when I couldnt figure something out I started to lose my focus.
+4.I could not figure out the bootstrapping from the modules, I had to go look online and ask peers to try and figure something out to bootsrap linear regressions. I feel like I missed where the information was on the modules on how to bootstrap with linear regressions.
 5.I still feel jumbled up and messy with my annotations, what can I imporve on to make everything look better and more organized. 
 
 
