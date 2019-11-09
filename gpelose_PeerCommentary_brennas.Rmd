@@ -1,0 +1,189 @@
+---
+title: "gpelose_OriginalHomeworkCode_04"
+author: "Greg Pelose"
+date: "11/5/2019"
+output: html_document
+---
+Brenna's Comments
+*FOr the chunck that starts on line 46, I get an error on the line "results <- boot(data=d, statistic=logit.bootstrap, R=1000)", as well as all the other "boots" functions. Is there another package that needs to be installed? 
+I found the answer, and added the new calls to the install and libray sections. I would just recommend clearing everything, and running the code a final time, to make sure you dont have any fake values or things you forgot to call.
+*Also, maybe this is because i cant get the function to work, but it looks like your function requires you to pass in "indicies", and i didnt see that in your function, but I must be missing something
+*Im also confused on the random number generator, but Im guessing it makes sense once the function works
+*for struggle 4, the main info on bootstrapping was in module 7. I dont think we went through it specifically in the context of linerar models 
+*Once the boots function works, everything you have seems to work well. I added sample code near the end to get the stats from the total model. I like this function, as I didnt use it, Im glad I know it exists now.
+*As far as annotating, I think that just adding annotations as you go would help, for example, in the function you wrote, adding what each line does/needs added might make it clearer.
+I also understand you wanting to keep the code that you used while figuring it out. As far as making it look better, you can set echo to false for the chuncks, which keeps them from showing up when you knit the final html. it just looks like {r echo=F}
+
+
+Question 1:
+
+[1] Using the “KamilarAndCooperData.csv” dataset, run a linear regression looking at log(HomeRange_km2) in relation to log(Body_mass_female_mean) and report your β coeffiecients (slope and intercept).
+***
+First I need to dowload the KamilarAndCooperData.csv data. 
+```{r}
+install.packages("curl")
+install.packages("boot")
+```
+
+```{r}
+library("curl")
+library("boot")
+```
+
+```{r}
+f <- curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall19/KamilarAndCooperData.csv")
+d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = FALSE)
+head(d)
+```
+Next I will perform a linear regression on my data.
+```{r}
+m <- lm(log(HomeRange_km2) ~ log(Body_mass_female_mean), data = d)
+m
+```
+
+I got -9.441 and 1.036 as my slope and my y-intercept. 
+
+***
+[2] Then, use bootstrapping to sample from your data 1000 times with replacement, each time fitting the same model and calculating the same coefficients. This generates a sampling distribution for each β coefficient.
+***
+```{r}
+logit.bootstrap <- function(data, indices) {
+
+  d <- data[indices, ]
+  fit <- lm(data = d, log(HomeRange_km2) ~ log(Body_mass_female_mean))
+
+  return(coef(fit))
+} #This function calculated the linear model for each output. 
+
+set.seed(250) # random number generator
+
+results <- boot(data=d, statistic=logit.bootstrap, R=1000) # 1000 samples 
+results
+```
+You can see my standard error numbers with the results.
+```{r}
+results <- boot(data=d, statistic=logit.bootstrap, R=1000) # 1000 samples 
+results
+```
+
+
+#everything below is me trying to figure this out.(ignore) I want to keep so I can see where I went wrong.
+***
+```{r}
+install.packages("boot")
+```
+```{r}
+library("boot")
+```
+
+
+```{r}
+boot(data = f, statistics= m, R = 1000) 
+```
+
+```{r}
+# function to obtain regression weights 
+bs <- function(formula, data, indices) {
+  d <- f[indices,] # allows boot to select sample 
+  fit <- lm(log(HomeRange_km2) ~ log(Body_mass_female_mean), data=d)
+  return(coef(fit)) 
+} 
+set.seed(800)
+
+results <- boot(data, statistic=bs, R=1000)
+
+```
+
+```{r}
+logit.bootstrap <- function(data, indices) {
+
+  d <- data[indices, ]
+  fit <- lm(data = d, log(h)~log(m))
+
+  return(coef(fit))
+} 
+
+set.seed(200) 
+
+results <- boot(data=d, statistic=logit.bootstrap, R=1000) # 1000 samples 
+```
+
+```{r}
+set <- NULL 
+n <- 15
+for (i in 1:1000){
+    set[i] <- mean(sample(f, n, replace=TRUE))
+}
+quantile(set, c(0.050, 0.950))
+se(set)
+```
+***
+NEXT PART OF QUESTION 2:
+
+Estimate the standard error for each of your β coefficients as the standard deviation of the sampling distribution from your bootstrap and determine the 95% CI for each of your β coefficients based on the appropriate quantiles from your sampling distribution.
+***
+
+I was able to achieve the standard errors from my bootsrap in my analysis above.
+
+Now I will get the confidence intervals from my bootstrap. 
+
+```{r}
+boot.ci(results)
+```
+
+Everything below this was me trying to figure this out, (ignore), I am keeping it so i can see where I went wrong.
+***
+```{r}
+install.packages("sciplot")
+```
+```{r}
+library("sciplot")
+```
+```{r}
+se(set)
+```
+
+```{r}
+upper <- mean(set) + qnorm(0.950, mean=0, sd=1)*se(set)
+lower <- mean(set) + qnorm(0.050, mean=0, sd=1)*se(set) 
+ci <- c(lower,upper)
+ci
+```
+***
+
+How does the former compare to the SE estimated from your entire dataset using the formula for standard error implemented in lm()?
+```{r}
+summary(m)
+#this alone will give you the stats if you want to look through the info
+#i pulled this from module 12, to make the SE easy to read
+t <- coef(summary(m))
+t <- data.frame(unlist(t))
+colnames(t) <- c("Est", "SE", "t", "p")
+t
+```
+
+***
+I am not exaclty sure how to answer this question, I dont know what is meant by the the former, I understand where I get the SE estimated from the entire dataset but not the error implemented in lm().
+***
+
+How does the latter compare to the 95% CI estimated from your entire dataset?
+```{r}
+ci <- confint(m, level = 0.95)  # using the results of lm()
+ci
+```
+***
+Same problem as before, I understand where my bootsrapped confidence intervals came from but I do not know where the "latter" is coming from to campare it to.
+
+
+5 struggles with my code
+1. I struggled to understand how to describe the questions about my data at the end of problem 2 in the homwork set. 
+2. I made many mistakes attempting to try and figure out the second question of the homework problem, but after a while I think that I was able to figure it out.
+3. I struggled to stay focused during this homework set, when I couldnt figure something out I started to lose my focus.
+4.I could not figure out the bootstrapping from the modules, I had to go look online and ask peers to try and figure something out to bootsrap linear regressions. I feel like I missed where the information was on the modules on how to bootstrap with linear regressions.
+5.I still feel jumbled up and messy with my annotations, what can I imporve on to make everything look better and more organized. 
+
+
+
+
+
+
