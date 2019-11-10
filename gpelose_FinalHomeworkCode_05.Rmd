@@ -1,0 +1,170 @@
+---
+title: "gpelose_FinalHomeworkCode_05"
+author: "Greg Pelose"
+date: "11/10/2019"
+output: html_document
+---
+
+Question 1:
+
+[1] Using the “KamilarAndCooperData.csv” dataset, run a linear regression looking at log(HomeRange_km2) in relation to log(Body_mass_female_mean) and report your β coeffiecients (slope and intercept).
+***
+First I need to dowload the KamilarAndCooperData.csv data. 
+```{r}
+install.packages("curl")
+```
+```{r}
+install.packages("Rmisc")
+install.packages("psych")
+install.packages("lattice")
+install.packages("plyr")
+```
+
+
+```{r}
+library(Rmisc) #for CIs in your dataset
+library(psych) #for SE for our dataset
+library(lattice) #needed for Rmisc
+library(plyr) #needed for Rmisc
+library(curl)
+library(boot)
+```
+
+
+```{r}
+f <- curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall19/KamilarAndCooperData.csv")
+d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = FALSE)
+head(d)
+t<-na.omit(d) 
+h<-t$HomeRange_km2
+m<-t$Body_mass_female_mean
+n<-cbind(h, m)
+length(t)
+d<-data.frame(n)
+CI(h, ci = 0.95)
+CI(m, ci = 0.95)
+describe(n, type = 2)
+```
+Next I will perform a linear regression on my data.
+```{r}
+m <- lm(log(h) ~ log(m), data = d)
+m 
+confint(m, level = 0.90) #gives CI
+```
+
+
+***
+[2] Then, use bootstrapping to sample from your data 1000 times with replacement, each time fitting the same model and calculating the same coefficients. This generates a sampling distribution for each β coefficient.
+***
+```{r}
+logit.bootstrap <- function(data, indices) {
+
+  d <- data[indices, ]
+  fit <- lm(data = d, log(h) ~ log(m))
+
+  return(coef(fit))
+} #This function calculated the linear model for each output. 
+
+set.seed(250) # random number generator
+
+results <- boot(data=d, statistic=logit.bootstrap, R=1000) # 1000 samples 
+results
+```
+You can see my standard error numbers with the results.
+
+
+#everything below is me trying to figure this out.(ignore) I want to keep so I can see where I went wrong.
+***
+
+```{r}
+boot(data = f, statistics= m, R = 1000) 
+```
+
+```{r}
+# function to obtain regression weights 
+bs <- function(formula, data, indices) {
+  d <- f[indices,] # allows boot to select sample 
+  fit <- lm(log(HomeRange_km2) ~ log(Body_mass_female_mean), data=d)
+  return(coef(fit)) 
+} 
+set.seed(800)
+
+results <- boot(data, statistic=bs, R=1000)
+
+```
+
+```{r}
+logit.bootstrap <- function(data, indices) {
+
+  d <- data[indices, ]
+  fit <- lm(data = d, log(h)~log(m))
+
+  return(coef(fit))
+} 
+
+set.seed(200) 
+
+results <- boot(data=d, statistic=logit.bootstrap, R=1000) # 1000 samples 
+```
+
+```{r}
+set <- NULL 
+n <- 15
+for (i in 1:1000){
+    set[i] <- mean(sample(f, n, replace=TRUE))
+}
+quantile(set, c(0.050, 0.950))
+se(set)
+```
+***
+NEXT PART OF QUESTION 2:
+
+Estimate the standard error for each of your β coefficients as the standard deviation of the sampling distribution from your bootstrap and determine the 95% CI for each of your β coefficients based on the appropriate quantiles from your sampling distribution.
+
+***
+
+I was able to achieve the standard errors from my bootsrap in my analysis above.
+
+Now I will get the confidence intervals from my bootstrap. 
+
+```{r}
+boot.ci(results)
+```
+
+Everything below this was me trying to figure this out, (ignore), I am keeping it so i can see where I went wrong.
+***
+```{r}
+install.packages("sciplot")
+```
+```{r}
+library("sciplot")
+```
+```{r}
+se(set)
+```
+
+```{r}
+upper <- mean(set) + qnorm(0.950, mean=0, sd=1)*se(set)
+lower <- mean(set) + qnorm(0.050, mean=0, sd=1)*se(set) 
+ci <- c(lower,upper)
+ci
+```
+***
+
+How does the former compare to the SE estimated from your entire dataset using the formula for standard error implemented in lm()?
+
+***
+I am not exaclty sure how to answer this question, as the former is set up in a "log" form and this makes it challenging to comare the data. 
+***
+
+How does the latter compare to the 95% CI estimated from your entire dataset?
+***
+Same problem as before, I understand where my bootsrapped confidence intervals came from but I do not know where the "latter" is coming from to campare it to.
+
+
+5 struggles with my code
+1. I struggled to understand how to describe the questions about my data at the end of problem 2 in the homwork set. 
+2. I made many mistakes attempting to try and figure out the second question of the homework problem, but after a while I think that I was able to figure it out.
+3. I struggled to stay focused during this homework set, when I couldnt figure something out I started to lose my focus.
+4.I could not figure out the bootstrapping from the modules, I had to go look online and ask peers to try and figure something out to bootsrap linear regressions. I feel like I missed where the information was on the modules on how to bootstrap with linear regressions.
+5.I still feel jumbled up and messy with my annotations, what can I imporve on to make everything look better and more organized. 
